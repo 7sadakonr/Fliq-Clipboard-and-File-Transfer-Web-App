@@ -12,6 +12,9 @@ export const useClipboardSync = () => {
     const [pendingClipboardItem, setPendingClipboardItem] = useState(null);
     const [copySuccess, setCopySuccess] = useState(false);
 
+    // Track processed clipboard IDs to prevent showing toast on reconnect
+    const processedClipboardIds = useRef(new Set());
+
     // 1. Sending: Read Local -> Peer
     const readAndSendClipboard = useCallback(async () => {
         try {
@@ -51,9 +54,24 @@ export const useClipboardSync = () => {
     useEffect(() => {
         if (!lastReceivedClipboard) return;
 
+        // Skip if this clipboard item was already processed (prevents toast on reconnect)
+        if (processedClipboardIds.current.has(lastReceivedClipboard.id)) {
+            console.log("Clipboard item already processed, skipping:", lastReceivedClipboard.id);
+            return;
+        }
+
         const attemptWrite = async () => {
-            const { text, fromDevice } = lastReceivedClipboard;
+            const { text, fromDevice, id } = lastReceivedClipboard;
             console.log("New clipboard item received, attempting write:", text);
+
+            // Mark this ID as processed
+            processedClipboardIds.current.add(id);
+
+            // Keep the set from growing too large
+            if (processedClipboardIds.current.size > 100) {
+                const idsArray = Array.from(processedClipboardIds.current);
+                processedClipboardIds.current = new Set(idsArray.slice(-50));
+            }
 
             try {
                 // Try to write immediately
