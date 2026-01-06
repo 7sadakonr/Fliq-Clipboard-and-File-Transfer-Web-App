@@ -1,0 +1,57 @@
+const CHUNK_SIZE = 64 * 1024; // 64KB for better throughput
+
+export const chunkFile = (file, onChunk, signal) => {
+    return new Promise((resolve, reject) => {
+        let offset = 0;
+        const reader = new FileReader();
+
+        reader.onload = async (e) => {
+            if (signal?.aborted) {
+                reject(new Error('Transfer cancelled'));
+                return;
+            }
+
+            const result = onChunk(e.target.result, offset);
+            if (result instanceof Promise) {
+                await result;
+            }
+
+            // Double check after async operation
+            if (signal?.aborted) {
+                reject(new Error('Transfer cancelled'));
+                return;
+            }
+
+            offset += e.target.result.byteLength;
+
+            if (offset < file.size) {
+                readNextChunk();
+            } else {
+                resolve();
+            }
+        };
+
+        reader.onerror = (err) => reject(err);
+
+        // Listen for abort event to stop immediately if reading is slow (though FileReader is usually fast)
+        if (signal) {
+            signal.addEventListener('abort', () => {
+                if (reader.readyState === FileReader.LOADING) {
+                    reader.abort();
+                }
+                reject(new Error('Transfer cancelled'));
+            });
+        }
+
+        const readNextChunk = () => {
+            const slice = file.slice(offset, offset + CHUNK_SIZE);
+            reader.readAsArrayBuffer(slice);
+        };
+
+        readNextChunk();
+    });
+};
+
+export const assembleFile = (chunks) => {
+    return new Blob(chunks);
+};
