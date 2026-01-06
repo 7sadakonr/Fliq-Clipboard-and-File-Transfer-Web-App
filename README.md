@@ -90,6 +90,7 @@ MIT License - feel free to use this project for personal or commercial purposes.
 
 ---
 
-Made with ❤️ by [@7sadakonr](https://github.com/7sadakonr)
+Made by [@7sadakonr](https://github.com/7sadakonr)
+
 
 
