@@ -84,12 +84,6 @@ src/
 └── utils/          # Helper Functions
 ```
 
-## 🌐 Deployment
-
-Deploy to Vercel with one click:
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/7sadakonr/Fliq-Clipboard-and-File-Transfer-Web-App)
-
 ## 📄 License
 
 MIT License - feel free to use this project for personal or commercial purposes.
@@ -97,4 +91,5 @@ MIT License - feel free to use this project for personal or commercial purposes.
 ---
 
 Made with ❤️ by [@7sadakonr](https://github.com/7sadakonr)
+
 
