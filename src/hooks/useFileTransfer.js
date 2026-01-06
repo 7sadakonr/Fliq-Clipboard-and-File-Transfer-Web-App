@@ -62,17 +62,15 @@ export const useFileTransfer = () => {
 
                 // Backpressure / Flow Control
                 if (activeConnection?.dataChannel) {
-                    // Buffer up to 1MB (was 64KB) to maximize throughput
-                    // Check every 5ms (was 50ms) to resume faster
-                    const MAX_BUFFER = 1024 * 1024; // 1MB
+                    // Buffer up to 4MB to maximize throughput on good connections
+                    // Check every 1ms for minimal latency
+                    const MAX_BUFFER = 4 * 1024 * 1024; // 4MB
 
                     while (activeConnection.dataChannel.bufferedAmount > MAX_BUFFER) {
-                        await new Promise(r => setTimeout(r, 5));
+                        await new Promise(r => setTimeout(r, 1));
                     }
-                } else {
-                    // Fallback pacing if no access to dataChannel
-                    await new Promise(r => setTimeout(r, 10));
                 }
+                // Removed fallback delay - let chunks flow as fast as possible
 
                 sendData('FILE', {
                     type: 'CHUNK',

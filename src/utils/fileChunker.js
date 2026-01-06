@@ -1,4 +1,4 @@
-const CHUNK_SIZE = 64 * 1024; // 64KB for better throughput
+const CHUNK_SIZE = 256 * 1024; // 256KB for faster throughput
 
 export const chunkFile = (file, onChunk, signal) => {
     return new Promise((resolve, reject) => {
